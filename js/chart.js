@@ -1,5 +1,12 @@
 let chartInstance = null;
 
+export function clearChart() {
+    if (chartInstance) {
+        chartInstance.destroy();
+        chartInstance = null;
+    }
+}
+
 export function renderChart(canvasId, labels, values, title, theme) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     

@@ -35,12 +35,12 @@
             <form id="settingsForm">
                 <div class="form-group">
                     <label for="lat" data-i18n="latitude">Latitude</label>
-                    <input type="number" id="lat" step="any" required>
+                    <input type="number" id="lat" step="any" min="-90" max="90" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="lon" data-i18n="longitude">Longitude</label>
-                    <input type="number" id="lon" step="any" required>
+                    <input type="number" id="lon" step="any" min="-180" max="180" required>
                 </div>
 
                 <div class="form-group">

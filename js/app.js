@@ -1,7 +1,7 @@
 import { getSettings, saveSettings } from './storage.js';
 import { getLanguage, applyTranslations, getTranslation } from './i18n.js';
 import { fetchSunlightData, processDataForDaytime } from './api.js';
-import { renderChart } from './chart.js';
+import { renderChart, clearChart } from './chart.js';
 
 let currentSettings = getSettings();
 
@@ -116,6 +116,7 @@ async function loadChartData() {
         console.error(err);
         error.textContent = err.message || 'Failed to load data';
         error.classList.remove('hidden');
+        clearChart();
         if (chartCanvas) {
              const ctx = chartCanvas.getContext('2d');
              ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);

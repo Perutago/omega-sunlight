@@ -10,7 +10,9 @@ export async function fetchSunlightData(lat, lon) {
 }
 
 export function processDataForDaytime(data) {
-    const now = new Date();
+    const tz = data.timezone || 'UTC';
+    const nowStr = new Date().toLocaleString('en-US', { timeZone: tz, hour12: false });
+    const now = new Date(nowStr);
     
     const sunrises = data.daily.sunrise.map(ts => new Date(ts));
     const sunsets = data.daily.sunset.map(ts => new Date(ts));

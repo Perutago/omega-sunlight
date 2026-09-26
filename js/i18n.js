@@ -16,7 +16,7 @@ const dictionary = {
         chartTitle: 'Shortwave Radiation (W/m²)'
     },
     ja: {
-        appTitle: 'Omega 日照量',
+        appTitle: 'Omega Sunlight',
         settingsTitle: '設定',
         latitude: '緯度',
         longitude: '経度',

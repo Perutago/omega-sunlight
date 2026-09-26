@@ -1,4 +1,4 @@
-# Project Rules (.agent/rules/project-profile.md)
+# Project Rules (.agent/rules/AGENTS.md)
 
 ## 対応プラットフォーム
 - PC用ブラウザ、Androidに対応する。

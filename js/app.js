@@ -8,6 +8,12 @@ let currentSettings = getSettings();
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
     setupEventListeners();
+    
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+            console.error('Service Worker registration failed:', err);
+        });
+    }
 });
 
 function initApp() {

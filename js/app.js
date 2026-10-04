@@ -112,12 +112,12 @@ async function loadChartData() {
 
     try {
         const data = await fetchSunlightData(currentSettings.lat, currentSettings.lon);
-        const { labels, values, date } = processDataForDaytime(data);
+        const { labels, values, weatherIcons, date } = processDataForDaytime(data);
         
         const lang = getLanguage(currentSettings.language);
         const title = `${getTranslation(lang, 'chartTitle')} - ${date}`;
         
-        renderChart('sunlightChart', labels, values, title, currentSettings.theme);
+        renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme);
     } catch (err) {
         console.error(err);
         error.textContent = err.message || 'Failed to load data';

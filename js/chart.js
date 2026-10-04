@@ -7,7 +7,7 @@ export function clearChart() {
     }
 }
 
-export function renderChart(canvasId, labels, values, title, theme) {
+export function renderChart(canvasId, labels, values, weatherIcons, title, theme) {
     const ctx = document.getElementById(canvasId).getContext('2d');
     
     if (chartInstance) {
@@ -18,7 +18,30 @@ export function renderChart(canvasId, labels, values, title, theme) {
     const textColor = isDark ? '#f8fafc' : '#0f172a';
     const gridColor = isDark ? '#334155' : '#e2e8f0';
 
+    const weatherPlugin = {
+        id: 'weatherPlugin',
+        afterDraw(chart) {
+            const { ctx, scales: { x }, chartArea: { bottom } } = chart;
+            if (!weatherIcons) return;
+
+            ctx.save();
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'top';
+            ctx.font = '24px Arial'; // Larger font size for weather icons
+
+            x.ticks.forEach((tick, index) => {
+                const xPos = x.getPixelForTick(index);
+                const icon = weatherIcons[index];
+                if (icon) {
+                    ctx.fillText(icon, xPos, bottom + 25);
+                }
+            });
+            ctx.restore();
+        }
+    };
+
     chartInstance = new Chart(ctx, {
+        plugins: [weatherPlugin],
         type: 'line',
         data: {
             labels: labels,
@@ -36,6 +59,11 @@ export function renderChart(canvasId, labels, values, title, theme) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    bottom: 35
+                }
+            },
             plugins: {
                 legend: {
                     labels: {

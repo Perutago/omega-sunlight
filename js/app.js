@@ -37,6 +37,18 @@ function setupEventListeners() {
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const settingsForm = document.getElementById('settingsForm');
 
+    const infoBtn = document.getElementById('infoBtn');
+    const infoModal = document.getElementById('infoModal');
+    const closeInfoBtn = document.getElementById('closeInfoBtn');
+
+    infoBtn.addEventListener('click', () => {
+        infoModal.classList.remove('hidden');
+    });
+
+    closeInfoBtn.addEventListener('click', () => {
+        infoModal.classList.add('hidden');
+    });
+
     settingsBtn.addEventListener('click', () => {
         document.getElementById('lat').value = currentSettings.lat;
         document.getElementById('lon').value = currentSettings.lon;

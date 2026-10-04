@@ -13,7 +13,16 @@ const dictionary = {
         cancel: 'Cancel',
         save: 'Save',
         loading: 'Loading data...',
-        chartTitle: 'Shortwave Radiation (W/m²)'
+        chartTitle: 'Shortwave Radiation (W/m²)',
+        infoTitle: 'Radiation Guide',
+        infoDesc: 'Shortwave radiation (W/m²) indicates the intensity of sunlight:',
+        info0: '0: Nighttime',
+        info10: '10-50: Sunrise/sunset, or very dark rainy days',
+        info100: '100-300: Cloudy days',
+        info400: '400-600: Partly cloudy, or sunny days in winter',
+        info700: '700-900: Clear sunny days in spring/autumn',
+        info1000: '1000+: Intense summer sunlight at noon',
+        close: 'Close'
     },
     ja: {
         appTitle: 'Omega Sunlight',
@@ -29,7 +38,16 @@ const dictionary = {
         cancel: 'キャンセル',
         save: '保存',
         loading: 'データを読み込み中...',
-        chartTitle: '短波放射量 (W/m²)'
+        chartTitle: '短波放射量 (W/m²)',
+        infoTitle: '短波放射量の目安',
+        infoDesc: '短波放射量（W/m²）は太陽からの光の強さ（日射量）を示します：',
+        info0: '0: 夜間（太陽が沈んでいる状態）',
+        info10: '10-50: 日の出直後・日没直前、または非常に暗い雨の日',
+        info100: '100-300: 厚い雲に覆われた曇りの日',
+        info400: '400-600: 薄曇りの日、または冬の晴天時',
+        info700: '700-900: 春や秋のよく晴れた日',
+        info1000: '1000+: 真夏の快晴時の正午ごろ（非常に強い日差し）',
+        close: '閉じる'
     }
 };
 

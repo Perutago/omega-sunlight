@@ -22,7 +22,9 @@ const dictionary = {
         info400: '400-600: Partly cloudy, or sunny days in winter',
         info700: '700-900: Clear sunny days in spring/autumn',
         info1000: '1000+: Intense summer sunlight at noon',
-        close: 'Close'
+        close: 'Close',
+        locationRequiredMessage: 'Please set latitude and longitude in the settings.',
+        openSettings: 'Open Settings'
     },
     ja: {
         appTitle: 'Omega Sunlight',
@@ -47,7 +49,9 @@ const dictionary = {
         info400: '400-600: 薄曇りの日、または冬の晴天時',
         info700: '700-900: 春や秋のよく晴れた日',
         info1000: '1000+: 真夏の快晴時の正午ごろ（非常に強い日差し）',
-        close: '閉じる'
+        close: '閉じる',
+        locationRequiredMessage: '設定画面で緯度と経度を設定してください。',
+        openSettings: '設定を開く'
     }
 };
 

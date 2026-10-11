@@ -25,10 +25,18 @@ function initApp() {
     // Select defaults for selects
     document.getElementById('theme').value = currentSettings.theme;
     document.getElementById('language').value = currentSettings.language;
-    document.getElementById('lat').value = currentSettings.lat;
-    document.getElementById('lon').value = currentSettings.lon;
+    document.getElementById('lat').value = currentSettings.lat ?? '';
+    document.getElementById('lon').value = currentSettings.lon ?? '';
 
     loadChartData();
+}
+
+function openSettingsModal() {
+    document.getElementById('lat').value = currentSettings.lat ?? '';
+    document.getElementById('lon').value = currentSettings.lon ?? '';
+    document.getElementById('theme').value = currentSettings.theme;
+    document.getElementById('language').value = currentSettings.language;
+    document.getElementById('settingsModal').classList.remove('hidden');
 }
 
 function setupEventListeners() {
@@ -36,6 +44,7 @@ function setupEventListeners() {
     const settingsModal = document.getElementById('settingsModal');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
     const settingsForm = document.getElementById('settingsForm');
+    const openSettingsNoticeBtn = document.getElementById('openSettingsNoticeBtn');
 
     const infoBtn = document.getElementById('infoBtn');
     const infoModal = document.getElementById('infoModal');
@@ -50,12 +59,14 @@ function setupEventListeners() {
     });
 
     settingsBtn.addEventListener('click', () => {
-        document.getElementById('lat').value = currentSettings.lat;
-        document.getElementById('lon').value = currentSettings.lon;
-        document.getElementById('theme').value = currentSettings.theme;
-        document.getElementById('language').value = currentSettings.language;
-        settingsModal.classList.remove('hidden');
+        openSettingsModal();
     });
+
+    if (openSettingsNoticeBtn) {
+        openSettingsNoticeBtn.addEventListener('click', () => {
+            openSettingsModal();
+        });
+    }
 
     closeSettingsBtn.addEventListener('click', () => {
         settingsModal.classList.add('hidden');
@@ -64,9 +75,12 @@ function setupEventListeners() {
     settingsForm.addEventListener('submit', (e) => {
         e.preventDefault();
         
+        const latVal = document.getElementById('lat').value.trim();
+        const lonVal = document.getElementById('lon').value.trim();
+
         const newSettings = {
-            lat: parseFloat(document.getElementById('lat').value),
-            lon: parseFloat(document.getElementById('lon').value),
+            lat: latVal !== '' ? parseFloat(latVal) : null,
+            lon: lonVal !== '' ? parseFloat(lonVal) : null,
             theme: document.getElementById('theme').value,
             language: document.getElementById('language').value
         };
@@ -115,12 +129,32 @@ async function loadChartData() {
     const loading = document.getElementById('loading');
     const error = document.getElementById('error');
     const chartCanvas = document.getElementById('sunlightChart');
+    const chartContainer = document.querySelector('.chart-container');
+    const locationNotice = document.getElementById('locationNotice');
     
+    // 緯度または経度が設定されていない場合の判定
+    const isLocationConfigured = currentSettings.lat !== null &&
+                                 currentSettings.lon !== null &&
+                                 !isNaN(currentSettings.lat) &&
+                                 !isNaN(currentSettings.lon);
+
+    if (!isLocationConfigured) {
+        if (loading) loading.classList.add('hidden');
+        if (error) error.classList.add('hidden');
+        clearChart();
+        if (chartCanvas) {
+            const ctx = chartCanvas.getContext('2d');
+            ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
+        }
+        if (chartContainer) chartContainer.classList.add('hidden');
+        if (locationNotice) locationNotice.classList.remove('hidden');
+        return;
+    }
+
+    if (locationNotice) locationNotice.classList.add('hidden');
+    if (chartContainer) chartContainer.classList.remove('hidden');
     loading.classList.remove('hidden');
     error.classList.add('hidden');
-    
-    // We just hide it visually to keep dimensions if needed, or don't touch
-    // The chart.js instance will just redraw over.
 
     try {
         const data = await fetchSunlightData(currentSettings.lat, currentSettings.lon);

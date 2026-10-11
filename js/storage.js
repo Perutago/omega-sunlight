@@ -1,6 +1,6 @@
 const DEFAULT_SETTINGS = {
-    lat: 35.6895, // Tokyo default
-    lon: 139.6917,
+    lat: null,
+    lon: null,
     theme: 'system',
     language: 'system'
 };
@@ -8,7 +8,12 @@ const DEFAULT_SETTINGS = {
 export function getSettings() {
     const saved = localStorage.getItem('omegaSettings');
     if (saved) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        try {
+            return { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+        } catch (e) {
+            console.error('Failed to parse saved settings:', e);
+            return DEFAULT_SETTINGS;
+        }
     }
     return DEFAULT_SETTINGS;
 }

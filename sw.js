@@ -1,4 +1,4 @@
-const CACHE_NAME = 'omega-sunlight-v2';
+const CACHE_NAME = 'omega-sunlight-v3';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

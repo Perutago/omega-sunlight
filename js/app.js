@@ -17,13 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function initApp() {
-    applyTheme(currentSettings.theme);
+    applyTheme(currentSettings.theme, currentSettings.appearance);
     const lang = getLanguage(currentSettings.language);
     document.documentElement.lang = lang;
     applyTranslations(lang);
     
     // Select defaults for selects
     document.getElementById('theme').value = currentSettings.theme;
+    if (document.getElementById('appearance')) {
+        document.getElementById('appearance').value = currentSettings.appearance;
+    }
     document.getElementById('language').value = currentSettings.language;
     document.getElementById('lat').value = currentSettings.lat ?? '';
     document.getElementById('lon').value = currentSettings.lon ?? '';
@@ -35,6 +38,9 @@ function openSettingsModal() {
     document.getElementById('lat').value = currentSettings.lat ?? '';
     document.getElementById('lon').value = currentSettings.lon ?? '';
     document.getElementById('theme').value = currentSettings.theme;
+    if (document.getElementById('appearance')) {
+        document.getElementById('appearance').value = currentSettings.appearance;
+    }
     document.getElementById('language').value = currentSettings.language;
     document.getElementById('settingsModal').classList.remove('hidden');
 }
@@ -77,23 +83,26 @@ function setupEventListeners() {
         
         const latVal = document.getElementById('lat').value.trim();
         const lonVal = document.getElementById('lon').value.trim();
+        const appearanceEl = document.getElementById('appearance');
 
         const newSettings = {
             lat: latVal !== '' ? parseFloat(latVal) : null,
             lon: lonVal !== '' ? parseFloat(lonVal) : null,
             theme: document.getElementById('theme').value,
+            appearance: appearanceEl ? appearanceEl.value : 'standard',
             language: document.getElementById('language').value
         };
 
         const changedLocation = newSettings.lat !== currentSettings.lat || newSettings.lon !== currentSettings.lon;
         const changedLanguage = newSettings.language !== currentSettings.language;
         const changedTheme = newSettings.theme !== currentSettings.theme;
+        const changedAppearance = newSettings.appearance !== currentSettings.appearance;
         
         currentSettings = newSettings;
         saveSettings(currentSettings);
         
-        if (changedTheme) {
-            applyTheme(currentSettings.theme);
+        if (changedTheme || changedAppearance) {
+            applyTheme(currentSettings.theme, currentSettings.appearance);
         }
         
         if (changedLanguage) {
@@ -102,7 +111,7 @@ function setupEventListeners() {
             applyTranslations(lang);
         }
 
-        if (changedLocation || changedLanguage || changedTheme) {
+        if (changedLocation || changedLanguage || changedTheme || changedAppearance) {
             loadChartData();
         }
 
@@ -111,17 +120,33 @@ function setupEventListeners() {
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
         if (currentSettings.theme === 'system') {
-            applyTheme('system');
+            applyTheme('system', currentSettings.appearance);
             loadChartData(); // Re-render chart for color changes
         }
     });
 }
 
-function applyTheme(theme) {
+function applyTheme(theme, appearance = 'standard') {
     if (theme === 'system') {
         document.documentElement.removeAttribute('data-theme');
     } else {
         document.documentElement.setAttribute('data-theme', theme);
+    }
+    document.documentElement.setAttribute('data-appearance', appearance);
+
+    // Update meta theme-color for browser tab / mobile UI
+    const isDark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    let themeColor = '#f8fafc';
+    if (appearance === 'cool') {
+        themeColor = isDark ? '#060913' : '#eef2f6';
+    } else if (appearance === 'pop') {
+        themeColor = isDark ? '#1f161b' : '#fff8f0';
+    } else {
+        themeColor = isDark ? '#0f172a' : '#f8fafc';
+    }
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+        metaThemeColor.setAttribute('content', themeColor);
     }
 }
 
@@ -163,7 +188,7 @@ async function loadChartData() {
         const lang = getLanguage(currentSettings.language);
         const title = `${getTranslation(lang, 'chartTitle')} - ${date}`;
         
-        renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme);
+        renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance);
     } catch (err) {
         console.error(err);
         error.textContent = err.message || 'Failed to load data';

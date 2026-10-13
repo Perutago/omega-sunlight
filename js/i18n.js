@@ -28,7 +28,17 @@ const dictionary = {
         info1000: '1000+: Intense summer sunlight at noon',
         close: 'Close',
         locationRequiredMessage: 'Please set latitude and longitude in the settings.',
-        openSettings: 'Open Settings'
+        openSettings: 'Open Settings',
+        searchPlaceholder: 'Search by city name...',
+        searchLabel: 'Location Search',
+        searchBtn: 'Search',
+        useCurrentLocation: '📍 Use Current Location',
+        gettingLocation: 'Getting location...',
+        locationError: 'Could not get location.',
+        locationDenied: 'Location permission denied.',
+        searchError: 'Search failed. Please try again.',
+        noResults: 'No results found.',
+        searching: 'Searching...'
     },
     ja: {
         appTitle: 'Omega Sunlight',
@@ -59,7 +69,17 @@ const dictionary = {
         info1000: '1000+: 真夏の快晴時の正午ごろ（非常に強い日差し）',
         close: '閉じる',
         locationRequiredMessage: '設定画面で緯度と経度を設定してください。',
-        openSettings: '設定を開く'
+        openSettings: '設定を開く',
+        searchPlaceholder: '地名・都市名で検索...',
+        searchLabel: '地名検索',
+        searchBtn: '検索',
+        useCurrentLocation: '📍 現在地を使用',
+        gettingLocation: '位置情報を取得中...',
+        locationError: '位置情報を取得できませんでした。',
+        locationDenied: '位置情報の許可が拒否されました。',
+        searchError: '検索に失敗しました。もう一度お試しください。',
+        noResults: '検索結果がありません。',
+        searching: '検索中...'
     }
 };
 

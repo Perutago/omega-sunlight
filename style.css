@@ -662,3 +662,129 @@ main {
     color: var(--primary-color);
     font-weight: 800;
 }
+
+/* --------------------------------------------------------------------------
+   10. Location Search Helper (Settings Modal)
+   -------------------------------------------------------------------------- */
+.location-search-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.location-search-input {
+    flex: 1;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all var(--transition-speed);
+    outline: none;
+}
+
+.location-search-input:focus {
+    border-color: var(--border-accent);
+    box-shadow: var(--accent-glow);
+}
+
+.location-search-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
+    padding: 0.625rem 1rem;
+    font-size: 0.9rem;
+}
+
+.location-results {
+    list-style: none;
+    margin-top: 0.4rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--input-radius);
+    overflow: hidden;
+    background-color: var(--card-bg);
+    box-shadow: var(--card-shadow);
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.location-results li {
+    padding: 0.6rem 0.85rem;
+    cursor: pointer;
+    font-size: 0.92rem;
+    color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+    line-height: 1.4;
+}
+
+.location-results li:last-child {
+    border-bottom: none;
+}
+
+.location-results li:hover,
+.location-results li:focus {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    outline: none;
+}
+
+.location-results li.no-results {
+    color: var(--text-muted);
+    cursor: default;
+    font-style: italic;
+}
+
+.location-results li.no-results:hover {
+    background-color: transparent;
+    color: var(--text-muted);
+}
+
+.location-gps-btn {
+    width: 100%;
+    margin-bottom: 0.25rem;
+    justify-content: center;
+    gap: 0.4rem;
+    font-size: 0.95rem;
+    padding: 0.6rem 1rem;
+}
+
+.location-gps-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+.location-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin: 0.75rem 0;
+    gap: 0.75rem;
+}
+
+.location-divider::before,
+.location-divider::after {
+    content: '';
+    flex: 1;
+    border-top: 1px solid var(--border-color);
+}
+
+.location-divider span {
+    display: none;
+}
+
+/* Cool appearance tweaks for location search */
+[data-appearance="cool"] .location-search-input,
+[data-appearance="cool"] .location-results {
+    font-family: 'Share Tech Mono', monospace;
+}
+
+[data-appearance="cool"] .location-results li:hover {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+}
+

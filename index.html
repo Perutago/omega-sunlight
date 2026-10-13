@@ -80,6 +80,24 @@
             <h2 data-i18n="settingsTitle">Settings</h2>
             
             <form id="settingsForm">
+                <!-- Location search helper -->
+                <div class="form-group">
+                    <label data-i18n="searchLabel">地名検索</label>
+                    <div class="location-search-row">
+                        <input type="text" id="locationSearch" class="location-search-input" placeholder="" data-i18n-placeholder="searchPlaceholder" autocomplete="off">
+                        <button type="button" id="searchLocationBtn" class="btn btn-secondary location-search-btn" data-i18n="searchBtn">検索</button>
+                    </div>
+                    <ul id="locationResults" class="location-results hidden"></ul>
+                </div>
+
+                <button type="button" id="useCurrentLocationBtn" class="btn btn-secondary location-gps-btn">
+                    <span data-i18n="useCurrentLocation">📍 現在地を使用</span>
+                </button>
+
+                <div class="location-divider">
+                    <span>――――</span>
+                </div>
+
                 <div class="form-group">
                     <label for="lat" data-i18n="latitude">Latitude</label>
                     <input type="number" id="lat" step="any" min="-90" max="90" placeholder="35.6895" required>

@@ -234,6 +234,67 @@ async function renderSelectedDay() {
 }
 
 
+/**
+ * 日本語住所形式のクエリを解析して、検索候補となるクエリのリストを返す。
+ * 例: "東京都新宿区" → { prefecture: "東京都", queries: ["東京都新宿区", "新宿区", "新宿"] }
+ * 例: "北海道札幌市" → { prefecture: "北海道", queries: ["北海道札幌市", "札幌市", "札幌"] }
+ * 例: "新宿"         → { prefecture: null, queries: ["新宿"] }
+ */
+function parseJapaneseAddress(query) {
+    // 都道府県のパターン: 北海道, *都, *府, *県
+    const prefecturePattern = /^(北海道|.{2,3}?[都府県])/;
+    const prefMatch = query.match(prefecturePattern);
+    const prefecture = prefMatch ? prefMatch[1] : null;
+
+    // 都道府県を除いた残りの部分
+    const rest = prefecture ? query.slice(prefecture.length) : query;
+
+    if (!rest) {
+        // 都道府県名のみ（例: "東京都"）→ そのまま検索
+        return { prefecture: null, queries: [query] };
+    }
+
+    if (!prefecture && !rest.match(/[市区町村郡]$/)) {
+        // 都道府県もなく行政区分接尾辞もない → 通常の検索
+        return { prefecture: null, queries: [query] };
+    }
+
+    const queries = [query]; // 元のクエリを最初に試す
+
+    // 市区町村の接尾辞を除去したバリエーションを生成
+    // "新宿区" → "新宿", "札幌市" → "札幌", "小金井市" → "小金井"
+    const suffixPattern = /(.+?)[市区町村郡]$/;
+    const suffixMatch = rest.match(suffixPattern);
+
+    if (prefecture) {
+        // 都道府県 + 市区町村名の場合
+        // rest自体("新宿区")を追加
+        if (!queries.includes(rest)) queries.push(rest);
+        // 接尾辞を除いた名前("新宿")を追加
+        if (suffixMatch && !queries.includes(suffixMatch[1])) {
+            queries.push(suffixMatch[1]);
+        }
+    } else {
+        // 都道府県なしで接尾辞ありの場合 (例: "新宿区")
+        if (suffixMatch && !queries.includes(suffixMatch[1])) {
+            queries.push(suffixMatch[1]);
+        }
+    }
+
+    return { prefecture, queries };
+}
+
+/**
+ * Open-Meteo APIに単一クエリで検索を実行
+ */
+async function fetchGeocodingResults(query, lang) {
+    const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=${lang}&format=json`;
+    const response = await fetch(url);
+    if (!response.ok) throw new Error('Network error');
+    const data = await response.json();
+    return data.results || [];
+}
+
 async function searchLocation(query) {
     if (!query) return;
     const lang = getLanguage(currentSettings.language);
@@ -247,21 +308,35 @@ async function searchLocation(query) {
     resultsEl.classList.add('hidden');
 
     try {
-        // Use Open-Meteo Geocoding API (no API key required)
-        const url = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(query)}&count=8&language=${lang}&format=json`;
-        const response = await fetch(url);
-        if (!response.ok) throw new Error('Network error');
-        const data = await response.json();
+        const { prefecture, queries } = parseJapaneseAddress(query);
+        let results = [];
+
+        // 各クエリ候補を順に試し、結果が得られたら終了
+        for (const q of queries) {
+            results = await fetchGeocodingResults(q, lang);
+            if (results.length > 0) break;
+        }
+
+        // 都道府県が指定されている場合、結果をフィルタリングして関連性を高める
+        if (prefecture && results.length > 0) {
+            const filtered = results.filter(place =>
+                place.admin1 === prefecture || place.country === prefecture
+            );
+            // フィルタ結果がある場合はそちらを使う（なければ全結果を表示）
+            if (filtered.length > 0) {
+                results = filtered;
+            }
+        }
 
         resultsEl.classList.remove('hidden');
 
-        if (!data.results || data.results.length === 0) {
+        if (results.length === 0) {
             const li = document.createElement('li');
             li.className = 'no-results';
             li.textContent = getTranslation(lang, 'noResults');
             resultsEl.appendChild(li);
         } else {
-            data.results.forEach(place => {
+            results.forEach(place => {
                 const li = document.createElement('li');
                 const parts = [place.name];
                 if (place.admin1) parts.push(place.admin1);

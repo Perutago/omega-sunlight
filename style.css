@@ -788,3 +788,86 @@ main {
     color: var(--primary-text);
 }
 
+/* --------------------------------------------------------------------------
+   11. Day Tabs (日付切り替えタブ)
+   -------------------------------------------------------------------------- */
+.day-tabs {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+    max-width: 1000px;
+    padding: 0 0.25rem;
+}
+
+.day-tab {
+    flex: 1;
+    padding: 0.55rem 1rem;
+    border-radius: var(--btn-radius);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+    background-color: var(--card-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition-speed);
+    letter-spacing: 0.01em;
+}
+
+.day-tab:hover {
+    border-color: var(--border-accent);
+    color: var(--primary-color);
+    transform: var(--btn-transform-hover);
+}
+
+.day-tab.active {
+    background-color: var(--primary-color);
+    color: var(--primary-text);
+    border-color: var(--primary-color);
+    box-shadow: var(--accent-glow);
+    cursor: default;
+    transform: none;
+}
+
+/* Cool appearance */
+[data-appearance="cool"] .day-tab {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+[data-appearance="cool"] .day-tab.active {
+    background-color: transparent;
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: var(--accent-glow);
+    position: relative;
+}
+
+[data-appearance="cool"] .day-tab.active::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-color: var(--primary-color);
+    opacity: 0.08;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+/* Pop appearance */
+[data-appearance="pop"] .day-tab {
+    font-weight: 700;
+    border-radius: 9999px;
+}
+
+[data-appearance="pop"] .day-tab.active {
+    box-shadow: var(--accent-glow);
+}
+
+/* --------------------------------------------------------------------------
+   12. Chart Fade Animation (チャート切り替えアニメーション)
+   -------------------------------------------------------------------------- */
+.chart-container.chart-fade {
+    opacity: 0;
+}

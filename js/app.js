@@ -1,9 +1,12 @@
 import { getSettings, saveSettings } from './storage.js';
 import { getLanguage, applyTranslations, getTranslation } from './i18n.js';
-import { fetchSunlightData, processDataForDaytime } from './api.js';
+import { fetchSunlightData, processDataForDaytime, getTwoDayDates } from './api.js';
 import { renderChart, clearChart } from './chart.js';
 
 let currentSettings = getSettings();
+let selectedDayOffset = 0; // 0=直近の日, 1=翌日
+let cachedApiData = null;  // APIデータをキャッシュしてタブ切り替え時の再リクエストを省く
+
 
 document.addEventListener('DOMContentLoaded', () => {
     initApp();
@@ -51,6 +54,7 @@ function openSettingsModal() {
 }
 
 function setupEventListeners() {
+    setupDayTabs();
     const settingsBtn = document.getElementById('settingsBtn');
     const settingsModal = document.getElementById('settingsModal');
     const closeSettingsBtn = document.getElementById('closeSettingsBtn');
@@ -167,6 +171,68 @@ function hideLocationResults() {
     const results = document.getElementById('locationResults');
     if (results) results.classList.add('hidden');
 }
+
+function setupDayTabs() {
+    const tab0 = document.getElementById('tab0');
+    const tab1 = document.getElementById('tab1');
+    if (!tab0 || !tab1) return;
+
+    tab0.addEventListener('click', () => {
+        if (selectedDayOffset === 0) return;
+        selectedDayOffset = 0;
+        updateTabActiveState();
+        renderSelectedDay();
+    });
+
+    tab1.addEventListener('click', () => {
+        if (selectedDayOffset === 1) return;
+        selectedDayOffset = 1;
+        updateTabActiveState();
+        renderSelectedDay();
+    });
+}
+
+function updateTabActiveState() {
+    const tab0 = document.getElementById('tab0');
+    const tab1 = document.getElementById('tab1');
+    if (!tab0 || !tab1) return;
+    tab0.classList.toggle('active', selectedDayOffset === 0);
+    tab1.classList.toggle('active', selectedDayOffset === 1);
+}
+
+function updateTabLabels(data) {
+    const tab0 = document.getElementById('tab0');
+    const tab1 = document.getElementById('tab1');
+    if (!tab0 || !tab1 || !data) return;
+
+    const lang = getLanguage(currentSettings.language);
+    const { date0, date1 } = getTwoDayDates(data);
+    const fmt = { month: 'numeric', day: 'numeric', weekday: 'short' };
+    tab0.textContent = date0.toLocaleDateString(lang, fmt);
+    tab1.textContent = date1.toLocaleDateString(lang, fmt);
+}
+
+async function renderSelectedDay() {
+    if (!cachedApiData) return;
+    const chartCanvas = document.getElementById('sunlightChart');
+    const chartContainer = document.querySelector('.chart-container');
+
+    // フェードアウト
+    if (chartContainer) chartContainer.classList.add('chart-fade');
+
+    await new Promise(r => setTimeout(r, 150));
+
+    const { labels, values, weatherIcons, date } = processDataForDaytime(cachedApiData, selectedDayOffset);
+    const lang = getLanguage(currentSettings.language);
+    const fmt = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    const title = `${getTranslation(lang, 'chartTitle')} - ${date.toLocaleDateString(lang, fmt)}`;
+
+    renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance);
+
+    // フェードイン
+    if (chartContainer) chartContainer.classList.remove('chart-fade');
+}
+
 
 async function searchLocation(query) {
     if (!query) return;
@@ -300,7 +366,8 @@ async function loadChartData() {
     const chartCanvas = document.getElementById('sunlightChart');
     const chartContainer = document.querySelector('.chart-container');
     const locationNotice = document.getElementById('locationNotice');
-    
+    const dayTabs = document.getElementById('dayTabs');
+
     // 緯度または経度が設定されていない場合の判定
     const isLocationConfigured = currentSettings.lat !== null &&
                                  currentSettings.lon !== null &&
@@ -316,6 +383,7 @@ async function loadChartData() {
             ctx.clearRect(0, 0, chartCanvas.width, chartCanvas.height);
         }
         if (chartContainer) chartContainer.classList.add('hidden');
+        if (dayTabs) dayTabs.classList.add('hidden');
         if (locationNotice) locationNotice.classList.remove('hidden');
         return;
     }
@@ -326,12 +394,18 @@ async function loadChartData() {
     error.classList.add('hidden');
 
     try {
-        const data = await fetchSunlightData(currentSettings.lat, currentSettings.lon);
-        const { labels, values, weatherIcons, date } = processDataForDaytime(data);
-        
+        cachedApiData = await fetchSunlightData(currentSettings.lat, currentSettings.lon);
+
+        // タブラベルをセット・表示
+        updateTabLabels(cachedApiData);
+        if (dayTabs) dayTabs.classList.remove('hidden');
+
+        // 現在選択中の日のグラフを描画
+        const { labels, values, weatherIcons, date } = processDataForDaytime(cachedApiData, selectedDayOffset);
         const lang = getLanguage(currentSettings.language);
-        const title = `${getTranslation(lang, 'chartTitle')} - ${date}`;
-        
+        const fmt = { year: 'numeric', month: 'numeric', day: 'numeric' };
+        const title = `${getTranslation(lang, 'chartTitle')} - ${date.toLocaleDateString(lang, fmt)}`;
+
         renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance);
     } catch (err) {
         console.error(err);

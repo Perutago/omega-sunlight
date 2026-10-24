@@ -102,11 +102,13 @@ export function renderChart(canvasId, labels, values, weatherIcons, title, theme
             ctx.textBaseline = 'top';
             ctx.font = '24px Arial, sans-serif';
 
+            const yPos = (x && typeof x.bottom === 'number') ? x.bottom + 8 : bottom + 35;
+
             x.ticks.forEach((tick, index) => {
                 const xPos = x.getPixelForTick(index);
                 const icon = weatherIcons[index];
                 if (icon) {
-                    ctx.fillText(icon, xPos, bottom + 25);
+                    ctx.fillText(icon, xPos, yPos);
                 }
             });
             ctx.restore();
@@ -137,7 +139,7 @@ export function renderChart(canvasId, labels, values, weatherIcons, title, theme
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    bottom: 35
+                    bottom: 40
                 }
             },
             plugins: {

@@ -84,6 +84,23 @@ export function getTwoDayDates(data) {
     };
 }
 
+/**
+ * 2日分の昼間データにおける日射量（shortwave_radiation）の最大値を返す
+ * @param {object} data - Open-Meteo APIレスポンス
+ * @returns {number|null}
+ */
+export function getTwoDayMaxRadiation(data) {
+    if (!data) return null;
+    const day0 = processDataForDaytime(data, 0);
+    const day1 = processDataForDaytime(data, 1);
+    const values0 = (day0.values || []).filter(v => typeof v === 'number' && !isNaN(v));
+    const values1 = (day1.values || []).filter(v => typeof v === 'number' && !isNaN(v));
+    const allValues = [...values0, ...values1];
+    if (allValues.length === 0) return null;
+    const max = Math.max(...allValues);
+    return max > 0 ? max : null;
+}
+
 function getWeatherIcon(code) {
     if (code === undefined || code === null) return '';
     if (code === 0) return '☀️'; // Clear sky

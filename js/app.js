@@ -1,6 +1,6 @@
 import { getSettings, saveSettings } from './storage.js';
 import { getLanguage, applyTranslations, getTranslation } from './i18n.js';
-import { fetchSunlightData, processDataForDaytime, getTwoDayDates } from './api.js';
+import { fetchSunlightData, processDataForDaytime, getTwoDayDates, getTwoDayMaxRadiation } from './api.js';
 import { renderChart, clearChart } from './chart.js';
 
 let currentSettings = getSettings();
@@ -226,8 +226,9 @@ async function renderSelectedDay() {
     const lang = getLanguage(currentSettings.language);
     const fmt = { year: 'numeric', month: 'numeric', day: 'numeric' };
     const title = `${getTranslation(lang, 'chartTitle')} - ${date.toLocaleDateString(lang, fmt)}`;
+    const maxRadiation = getTwoDayMaxRadiation(cachedApiData);
 
-    renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance);
+    renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance, maxRadiation);
 
     // フェードイン
     if (chartContainer) chartContainer.classList.remove('chart-fade');
@@ -480,8 +481,9 @@ async function loadChartData() {
         const lang = getLanguage(currentSettings.language);
         const fmt = { year: 'numeric', month: 'numeric', day: 'numeric' };
         const title = `${getTranslation(lang, 'chartTitle')} - ${date.toLocaleDateString(lang, fmt)}`;
+        const maxRadiation = getTwoDayMaxRadiation(cachedApiData);
 
-        renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance);
+        renderChart('sunlightChart', labels, values, weatherIcons, title, currentSettings.theme, currentSettings.appearance, maxRadiation);
     } catch (err) {
         console.error(err);
         error.textContent = err.message || 'Failed to load data';

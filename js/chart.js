@@ -7,7 +7,7 @@ export function clearChart() {
     }
 }
 
-export function renderChart(canvasId, labels, values, weatherIcons, title, theme, appearance = 'standard') {
+export function renderChart(canvasId, labels, values, weatherIcons, title, theme, appearance = 'standard', maxRadiation = null) {
     const canvas = document.getElementById(canvasId);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -169,6 +169,7 @@ export function renderChart(canvasId, labels, values, weatherIcons, title, theme
                 },
                 y: {
                     beginAtZero: true,
+                    ...(typeof maxRadiation === 'number' && maxRadiation > 0 ? { suggestedMax: maxRadiation } : {}),
                     ticks: {
                         color: textColor,
                         font: {
